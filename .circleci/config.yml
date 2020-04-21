@@ -1,0 +1,63 @@
+version: 2
+
+# CI/CD Service Principal Permissions
+# - http://aksPrincipal/user_impersonation
+# - https://graph.windows.net/Application.ReadWrite.OwnedBy
+# - https://graph.microsoft.com/Application.ReadWrite.OwnedBy
+
+jobs:
+  build:
+    docker:
+      - image: microsoft/azure-cli
+    environment:
+      TERRAFORM_VERSION: 0.12.24
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install Terraform
+          command: |
+            wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+            unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+            unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin
+
+      - run:
+          name: Configure test cluster env
+          command: |
+            echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
+
+      - run:
+          name: Terraform fmt
+          command: terraform fmt -check
+
+      - run:
+          name: AKS install kubectl
+          command: az aks install-cli
+
+      - run:
+          name: Terraform init
+          command: terraform init
+
+      - run:
+          name: Terraform workspace create
+          command: terraform workspace new ${WORKSPACE}
+
+      - run:
+          name: Terraform apply
+          command: terraform apply -auto-approve
+
+      - run:
+          name: Terraform plan
+          command: terraform plan -detailed-exitcode
+
+      - run:
+          name: Terraform destroy
+          command: terraform destroy -auto-approve || (sleep 5m && terraform destroy -auto-approve)
+          when: always
+
+      - run:
+          name: Terraform workspace delete
+          command: terraform workspace select default && terraform workspace delete ${WORKSPACE}
+          when: always
+
