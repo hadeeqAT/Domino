@@ -94,4 +94,5 @@ variable "node_pools" {
 variable subscription_id {
   type        = string
   description = "An existing Subscription ID to add the deployment"
+  default     = ""
 }
