@@ -1,4 +1,7 @@
+output "kubeconfig" {
+  value = azurerm_kubernetes_cluster.aks.kube_config_raw
+}
 
-output "kube_config" {
-  value = azurerm_kubernetes_cluster.aks.kube_config
+output "subscription_id" {
+  value = data.azurerm_subscription.current.subscription_id
 }
