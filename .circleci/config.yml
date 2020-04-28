@@ -25,6 +25,7 @@ jobs:
       - run:
           name: Configure test cluster env
           command: |
+            echo 'export TF_VAR_aks_tags=\{\"CIRCLE_BUILD_URL\"=\"${CIRCLE_BUILD_URL}\",\"CIRCLE_PR_NUMBER\"=\"${CIRCLE_PR_NUMBER}\",\"CIRCLE_PULL_REQUEST\"=\"${CIRCLE_PULL_REQUEST}\",\"CIRCLE_REPOSITORY_URL\"=\"${CIRCLE_REPOSITORY_URL}\"\}' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
 
       - run:
