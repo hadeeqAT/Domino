@@ -20,6 +20,12 @@ variable "cluster_name" {
   description = "The Domino cluster name for the K8s cluster and resource group"
 }
 
+variable "resource_group_name" {
+  type        = string
+  default     = null
+  description = "Name of optional pre-existing resource group to install AKS in"
+}
+
 variable "location" {
   default = "West US 2"
 }
@@ -92,6 +98,37 @@ variable "node_pools" {
       enable_auto_scaling   = true
       min_count             = 1
       max_count             = 4
+    }
+  }
+}
+
+variable "storage_account_name" {
+  type        = string
+  default     = null
+  description = "Optional custom name for Azure storage account"
+}
+
+variable "storage_account_tier" {
+  type    = string
+  default = "Standard"
+}
+
+variable "storage_account_replication_type" {
+  type    = string
+  default = "LRS"
+}
+
+variable "containers" {
+  type = map(object({
+    container_access_type = string
+  }))
+
+  default = {
+    registry = {
+      container_access_type = "private"
+    }
+    backups = {
+      container_access_type = "private"
     }
   }
 }
