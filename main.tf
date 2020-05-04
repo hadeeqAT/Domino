@@ -59,6 +59,16 @@ resource "azurerm_log_analytics_solution" "logs" {
   }
 }
 
+data "azurerm_subscription" "current" {
+  subscription_id = var.subscription_id
+}
+
+resource "azurerm_role_assignment" "sp" {
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.aks.identity[0].principal_id
+}
+
 resource "azurerm_kubernetes_cluster" "aks" {
   lifecycle {
     ignore_changes = [
@@ -91,14 +101,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
     tags                  = {}
   }
 
-  #  Commented out until we fix loadbalancer public ip provisioning issue, see sp.tf
-  #  identity {
-  #    type = "SystemAssigned"
-  #  }
-
-  service_principal {
-    client_id     = azuread_service_principal.sp.application_id
-    client_secret = azuread_service_principal_password.sp.value
+  identity {
+    type = "SystemAssigned"
   }
 
   addon_profile {
