@@ -89,7 +89,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     enable_node_public_ip = var.node_pools.platform.enable_node_public_ip
     name                  = "platform"
-    node_count            = var.node_pools.platform.max_count
+    node_count            = var.node_pools.platform.min_count
     node_labels           = merge({ "dominodatalab.com/node-pool" : "platform" }, var.node_pools.platform.node_labels)
     vm_size               = var.node_pools.platform.vm_size
     availability_zones    = var.node_pools.platform.zones
@@ -107,6 +107,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   addon_profile {
+    kube_dashboard {
+      enabled = false
+    }
+
     oms_agent {
       enabled                    = true
       log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
@@ -143,7 +147,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   enable_node_public_ip = each.value.enable_node_public_ip
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   name                  = each.key
-  node_count            = each.value.max_count
+  node_count            = each.value.min_count
   vm_size               = each.value.vm_size
   availability_zones    = each.value.zones
   max_pods              = 250
