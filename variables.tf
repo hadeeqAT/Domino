@@ -1,12 +1,7 @@
-
-variable "aks_tags" {
+variable "tags" {
   type        = map(string)
   default     = {}
-  description = "AKS Key=Value tags"
-}
-
-variable "agent_count" {
-  default = 3
+  description = "Tags to apply to resources"
 }
 
 variable "api_server_authorized_ip_ranges" {
@@ -49,12 +44,7 @@ variable "log_analytics_workspace_name" {
   default = "testLogAnalyticsWorkspaceName"
 }
 
-# refer https://azure.microsoft.com/global-infrastructure/services/?products=monitor for log analytics available regions
-variable "log_analytics_workspace_location" {
-  default = "eastus"
-}
-
-# refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing 
+# refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing
 variable "log_analytics_workspace_sku" {
   default = "PerGB2018"
 }
