@@ -70,49 +70,57 @@ variable "node_pools" {
     enable_auto_scaling   = bool
     min_count             = number
     max_count             = number
+    max_pods              = number
+    os_disk_size_gb       = number
   }))
   default = {
     compute = {
       enable_node_public_ip = false
-      vm_size               = "Standard_DS4_v2"
+      vm_size               = "Standard_D8s_v4"
       zones                 = ["1", "2", "3"]
       node_labels = {
-        "domino/build-node"            = "true"
-        "dominodatalab.com/build-node" = "true"
-        "dominodatalab.com/node-pool"  = "default"
+        "dominodatalab.com/node-pool" = "default"
+      }
+      node_os             = "Linux"
+      node_taints         = []
+      enable_auto_scaling = true
+      min_count           = 0
+      max_count           = 10
+      max_pods            = 30
+      os_disk_size_gb     = 128
+    }
+    gpu = {
+      enable_node_public_ip = false
+      vm_size               = "Standard_NC6s_v3"
+      zones                 = []
+      node_labels = {
+        "dominodatalab.com/node-pool" = "default-gpu"
+        "nvidia.com/gpu"              = "true"
+      }
+      node_os = "Linux"
+      node_taints = [
+        "nvidia.com/gpu=true:NoExecute"
+      ]
+      enable_auto_scaling = true
+      min_count           = 0
+      max_count           = 1
+      max_pods            = 30
+      os_disk_size_gb     = 128
+    }
+    platform = {
+      enable_node_public_ip = false
+      vm_size               = "Standard_D8s_v4"
+      zones                 = ["1", "2", "3"]
+      node_labels = {
+        "dominodatalab.com/node-pool" = "platform"
       }
       node_os             = "Linux"
       node_taints         = []
       enable_auto_scaling = true
       min_count           = 1
-      max_count           = 4
-    }
-    # Example GPU Configuration
-    # gpu = {
-    #   vm_size = "Standard_DS3_v2"
-    #   zones   = ["1", "2", "3"]
-    #   node_labels = {
-    #     "dominodatalab.com/node-pool" = "default-gpu"
-    #     "nvidia.com/gpu"              = "true"
-    #   }
-    #   node_os = "Linux"
-    #   node_taints = [
-    #     "nvidia.com/gpu=true"
-    #   ]
-    #   enable_auto_scaling = true
-    #   min_count           = 1
-    #   max_count           = 1
-    # }
-    platform = {
-      enable_node_public_ip = false
-      vm_size               = "Standard_DS5_v2"
-      zones                 = ["1", "2", "3"]
-      node_labels           = {}
-      node_os               = "Linux"
-      node_taints           = []
-      enable_auto_scaling   = true
-      min_count             = 1
-      max_count             = 4
+      max_count           = 3
+      max_pods            = 60
+      os_disk_size_gb     = 128
     }
   }
 }

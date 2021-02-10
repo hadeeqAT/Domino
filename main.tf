@@ -90,15 +90,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
     enable_node_public_ip = var.node_pools.platform.enable_node_public_ip
     name                  = "platform"
     node_count            = var.node_pools.platform.min_count
-    node_labels           = merge({ "dominodatalab.com/node-pool" : "platform" }, var.node_pools.platform.node_labels)
+    node_labels           = var.node_pools.platform.node_labels
     vm_size               = var.node_pools.platform.vm_size
     availability_zones    = var.node_pools.platform.zones
-    max_pods              = 250
-    os_disk_size_gb       = 128
+    os_disk_size_gb       = var.node_pools.platform.os_disk_size_gb
     node_taints           = var.node_pools.platform.node_taints
     enable_auto_scaling   = var.node_pools.platform.enable_auto_scaling
     min_count             = var.node_pools.platform.min_count
     max_count             = var.node_pools.platform.max_count
+    max_pods              = var.node_pools.platform.max_pods
     tags                  = {}
   }
 
@@ -150,15 +150,15 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   node_count            = each.value.min_count
   vm_size               = each.value.vm_size
   availability_zones    = each.value.zones
-  max_pods              = 250
-  os_disk_size_gb       = 128
+  os_disk_size_gb       = each.value.os_disk_size_gb
   os_type               = each.value.node_os
-  node_labels           = merge({ "dominodatalab.com/node-pool" : each.key }, each.value.node_labels)
+  node_labels           = each.value.node_labels
   node_taints           = each.value.node_taints
   enable_auto_scaling   = each.value.enable_auto_scaling
   min_count             = each.value.min_count
   max_count             = each.value.max_count
-  tags                  = {}
+  max_pods              = each.value.max_pods
+  tags                  = var.tags
 }
 
 resource "azurerm_storage_account" "domino" {
