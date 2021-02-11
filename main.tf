@@ -1,16 +1,21 @@
-provider "azurerm" {
-  version    = ">=2.7.0"
-  partner_id = "31912fbf-f6dd-5176-bffb-0a01e8ac71f2"
-  features {}
-}
-
 terraform {
+  required_providers {
+    azurerm = {
+      version = "~> 2.46"
+    }
+  }
+
   backend "azurerm" {
     resource_group_name  = "dominoterraform"
     storage_account_name = "dominoterraformstorage"
     container_name       = "tfstate"
     key                  = "dev.terraform.tfstate"
   }
+}
+
+provider "azurerm" {
+  partner_id = "31912fbf-f6dd-5176-bffb-0a01e8ac71f2"
+  features {}
 }
 
 locals {
