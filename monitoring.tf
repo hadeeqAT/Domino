@@ -65,4 +65,24 @@ resource "azurerm_monitor_diagnostic_setting" "control-plane" {
       days    = 7
     }
   }
+
+  log {
+    category = "guard"
+    enabled  = false
+  }
+
+  log {
+    category = "kube-audit"
+    enabled  = false
+  }
+
+  log {
+    category = "kube-audit-admin"
+    enabled  = false
+  }
+
+  metric {
+    category = "AllMetrics"
+    enabled  = false
+  }
 }
