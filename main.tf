@@ -22,12 +22,9 @@ locals {
   cluster_name   = var.cluster_name != null ? var.cluster_name : terraform.workspace
   resource_group = var.resource_group_name != null ? data.azurerm_resource_group.k8s[0] : azurerm_resource_group.k8s[0]
 
-  # Terraform doesn't accept backslash escapes inside the replace function here for some reason,
-  # nor does it allow for single quotes. This does, somehow, work, but messes up syntax highlighting.
-  storage_account_name = var.storage_account_name != null ? var.storage_account_name : substr("${replace(local.cluster_name, "/[_-]/", "")}dominostorage", 0, 24)
+  safe_storage_cluster_name = replace(local.cluster_name, "/[_-]/", "")
+  storage_account_name      = var.storage_account_name != null ? var.storage_account_name : substr("${local.safe_storage_cluster_name}dominostorage", 0, 24)
 }
-#" this comment is to fix syntax highlighting
-
 
 data "azurerm_resource_group" "k8s" {
   count = var.resource_group_name != null ? 1 : 0

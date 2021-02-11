@@ -1,16 +1,19 @@
 resource "azurerm_kubernetes_cluster" "aks" {
   lifecycle {
     ignore_changes = [
-      default_node_pool[0].node_count
+      default_node_pool[0].node_count,
+      default_node_pool[0].max_count,
+      # VM Size changes cause recreation of the entire cluster
+      default_node_pool[0].vm_size
     ]
   }
 
-  name                       = local.cluster_name
-  enable_pod_security_policy = false
-  location                   = local.resource_group.location
-  resource_group_name        = local.resource_group.name
-  dns_prefix                 = local.cluster_name
-  private_cluster_enabled    = false
+  name                    = local.cluster_name
+  location                = local.resource_group.location
+  resource_group_name     = local.resource_group.name
+  dns_prefix              = local.cluster_name
+  private_cluster_enabled = false
+  sku_tier                = var.cluster_sku_tier
 
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 
@@ -27,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     min_count             = var.node_pools.platform.min_count
     max_count             = var.node_pools.platform.max_count
     max_pods              = var.node_pools.platform.max_pods
-    tags                  = {}
+    tags                  = var.tags
   }
 
   identity {
@@ -59,9 +62,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   lifecycle {
-    ignore_changes = [
-      node_count
-    ]
+    ignore_changes = [node_count, max_count]
   }
 
   for_each = {

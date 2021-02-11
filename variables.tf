@@ -1,9 +1,3 @@
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "Tags to apply to resources"
-}
-
 variable "api_server_authorized_ip_ranges" {
   type        = list(string)
   description = "The IP ranges to whitelist for incoming traffic to the masters"
@@ -13,6 +7,12 @@ variable "cluster_name" {
   type        = string
   default     = null
   description = "The Domino cluster name for the K8s cluster and resource group"
+}
+
+variable "cluster_sku_tier" {
+  type        = string
+  default     = null
+  description = "The Domino cluster SKU (defaults to Free)"
 }
 
 variable "containers" {
@@ -38,10 +38,6 @@ variable "resource_group_name" {
 
 variable "location" {
   default = "West US 2"
-}
-
-variable "log_analytics_workspace_name" {
-  default = "testLogAnalyticsWorkspaceName"
 }
 
 # refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing
@@ -135,4 +131,10 @@ variable "subscription_id" {
   type        = string
   description = "An existing Subscription ID to add the deployment"
   default     = ""
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Tags to apply to resources"
 }
