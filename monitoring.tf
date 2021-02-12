@@ -24,6 +24,12 @@ resource "azurerm_log_analytics_solution" "logs" {
   }
 
   tags = local.tags
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "control-plane" {

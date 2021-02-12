@@ -7,6 +7,12 @@ resource "azurerm_storage_account" "domino" {
   account_replication_type = var.storage_account_replication_type
   access_tier              = "Hot"
   tags                     = local.tags
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_storage_container" "domino_containers" {
