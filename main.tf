@@ -24,6 +24,8 @@ locals {
 
   safe_storage_cluster_name = replace(local.cluster_name, "/[_-]/", "")
   storage_account_name      = var.storage_account_name != null ? var.storage_account_name : substr("${local.safe_storage_cluster_name}dominostorage", 0, 24)
+
+  tags = merge({ "Cluster": local.cluster_name }, var.tags)
 }
 
 data "azurerm_resource_group" "k8s" {
@@ -35,7 +37,7 @@ resource "azurerm_resource_group" "k8s" {
   count    = var.resource_group_name == null ? 1 : 0
   name     = local.cluster_name
   location = var.location
-  tags     = var.tags
+  tags     = local.tags
 }
 
 data "azurerm_subscription" "current" {

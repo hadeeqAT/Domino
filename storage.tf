@@ -6,7 +6,7 @@ resource "azurerm_storage_account" "domino" {
   account_tier             = var.storage_account_tier
   account_replication_type = var.storage_account_replication_type
   access_tier              = "Hot"
-  tags                     = var.tags
+  tags                     = local.tags
 }
 
 resource "azurerm_storage_container" "domino_containers" {

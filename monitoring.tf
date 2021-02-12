@@ -8,7 +8,7 @@ resource "azurerm_log_analytics_workspace" "logs" {
   location            = local.resource_group.location
   resource_group_name = local.resource_group.name
   sku                 = var.log_analytics_workspace_sku
-  tags                = var.tags
+  tags                = local.tags
 }
 
 resource "azurerm_log_analytics_solution" "logs" {
@@ -22,7 +22,8 @@ resource "azurerm_log_analytics_solution" "logs" {
     publisher = "Microsoft"
     product   = "OMSGallery/ContainerInsights"
   }
-  tags = var.tags
+
+  tags = local.tags
 }
 
 resource "azurerm_monitor_diagnostic_setting" "control-plane" {

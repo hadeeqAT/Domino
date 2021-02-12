@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     min_count             = var.node_pools.platform.min_count
     max_count             = var.node_pools.platform.max_count
     max_pods              = var.node_pools.platform.max_pods
-    tags                  = var.tags
+    tags                  = local.tags
   }
 
   identity {
@@ -57,7 +57,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     service_cidr       = "100.97.0.0/16"
   }
 
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
@@ -86,5 +86,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   min_count             = each.value.min_count
   max_count             = each.value.max_count
   max_pods              = each.value.max_pods
-  tags                  = var.tags
+  tags                  = local.tags
 }
