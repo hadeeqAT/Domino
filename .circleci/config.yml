@@ -32,16 +32,16 @@ jobs:
           command: terraform fmt -check
 
       - run:
-          name: Terraform validate
-          command: terraform validate
-
-      - run:
           name: AKS install kubectl
           command: az aks install-cli
 
       - run:
           name: Terraform init
           command: terraform init
+
+      - run:
+          name: Terraform validate
+          command: terraform validate
 
       - run:
           name: Terraform workspace create
