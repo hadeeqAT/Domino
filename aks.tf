@@ -64,7 +64,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   lifecycle {
-    ignore_changes = [node_count, max_count]
+    ignore_changes = [node_count, max_count, tags]
   }
 
   for_each = {
@@ -89,11 +89,4 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   max_count             = each.value.max_count
   max_pods              = each.value.max_pods
   tags                  = local.tags
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
-
 }
