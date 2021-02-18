@@ -10,7 +10,7 @@ jobs:
     docker:
       - image: microsoft/azure-cli
     environment:
-      TERRAFORM_VERSION: 0.12.24
+      TERRAFORM_VERSION: 0.12.30
 
     steps:
       - checkout
@@ -19,13 +19,12 @@ jobs:
           name: Install Terraform
           command: |
             wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-            unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
             unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin
 
       - run:
           name: Configure test cluster env
           command: |
-            echo 'export TF_VAR_aks_tags=\{\"CIRCLE_BUILD_URL\"=\"${CIRCLE_BUILD_URL}\",\"CIRCLE_PR_NUMBER\"=\"${CIRCLE_PR_NUMBER}\",\"CIRCLE_PULL_REQUEST\"=\"${CIRCLE_PULL_REQUEST}\",\"CIRCLE_REPOSITORY_URL\"=\"${CIRCLE_REPOSITORY_URL}\"\}' >> $BASH_ENV
+            echo 'export TF_VAR_tags=\{\"CIRCLE_BUILD_URL\"=\"${CIRCLE_BUILD_URL}\",\"CIRCLE_PR_NUMBER\"=\"${CIRCLE_PR_NUMBER}\",\"CIRCLE_PULL_REQUEST\"=\"${CIRCLE_PULL_REQUEST}\",\"CIRCLE_REPOSITORY_URL\"=\"${CIRCLE_REPOSITORY_URL}\"\}' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
 
       - run:
@@ -39,6 +38,10 @@ jobs:
       - run:
           name: Terraform init
           command: terraform init
+
+      - run:
+          name: Terraform validate
+          command: terraform validate
 
       - run:
           name: Terraform workspace create
@@ -61,4 +64,3 @@ jobs:
           name: Terraform workspace delete
           command: terraform workspace select default && terraform workspace delete ${WORKSPACE}
           when: always
-

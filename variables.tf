@@ -1,14 +1,3 @@
-
-variable "aks_tags" {
-  type        = map(string)
-  default     = {}
-  description = "AKS Key=Value tags"
-}
-
-variable "agent_count" {
-  default = 3
-}
-
 variable "api_server_authorized_ip_ranges" {
   type        = list(string)
   description = "The IP ranges to whitelist for incoming traffic to the masters"
@@ -18,6 +7,12 @@ variable "cluster_name" {
   type        = string
   default     = null
   description = "The Domino cluster name for the K8s cluster and resource group"
+}
+
+variable "cluster_sku_tier" {
+  type        = string
+  default     = null
+  description = "The Domino cluster SKU (defaults to Free)"
 }
 
 variable "containers" {
@@ -45,16 +40,7 @@ variable "location" {
   default = "West US 2"
 }
 
-variable "log_analytics_workspace_name" {
-  default = "testLogAnalyticsWorkspaceName"
-}
-
-# refer https://azure.microsoft.com/global-infrastructure/services/?products=monitor for log analytics available regions
-variable "log_analytics_workspace_location" {
-  default = "eastus"
-}
-
-# refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing 
+# refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing
 variable "log_analytics_workspace_sku" {
   default = "PerGB2018"
 }
@@ -70,49 +56,57 @@ variable "node_pools" {
     enable_auto_scaling   = bool
     min_count             = number
     max_count             = number
+    max_pods              = number
+    os_disk_size_gb       = number
   }))
   default = {
     compute = {
       enable_node_public_ip = false
-      vm_size               = "Standard_DS4_v2"
+      vm_size               = "Standard_D8s_v4"
       zones                 = ["1", "2", "3"]
       node_labels = {
-        "domino/build-node"            = "true"
-        "dominodatalab.com/build-node" = "true"
-        "dominodatalab.com/node-pool"  = "default"
+        "dominodatalab.com/node-pool" = "default"
+      }
+      node_os             = "Linux"
+      node_taints         = []
+      enable_auto_scaling = true
+      min_count           = 0
+      max_count           = 10
+      max_pods            = 30
+      os_disk_size_gb     = 128
+    }
+    gpu = {
+      enable_node_public_ip = false
+      vm_size               = "Standard_NC6s_v3"
+      zones                 = []
+      node_labels = {
+        "dominodatalab.com/node-pool" = "default-gpu"
+        "nvidia.com/gpu"              = "true"
+      }
+      node_os = "Linux"
+      node_taints = [
+        "nvidia.com/gpu=true:NoExecute"
+      ]
+      enable_auto_scaling = true
+      min_count           = 0
+      max_count           = 1
+      max_pods            = 30
+      os_disk_size_gb     = 128
+    }
+    platform = {
+      enable_node_public_ip = false
+      vm_size               = "Standard_D8s_v4"
+      zones                 = ["1", "2", "3"]
+      node_labels = {
+        "dominodatalab.com/node-pool" = "platform"
       }
       node_os             = "Linux"
       node_taints         = []
       enable_auto_scaling = true
       min_count           = 1
-      max_count           = 4
-    }
-    # Example GPU Configuration
-    # gpu = {
-    #   vm_size = "Standard_DS3_v2"
-    #   zones   = ["1", "2", "3"]
-    #   node_labels = {
-    #     "dominodatalab.com/node-pool" = "default-gpu"
-    #     "nvidia.com/gpu"              = "true"
-    #   }
-    #   node_os = "Linux"
-    #   node_taints = [
-    #     "nvidia.com/gpu=true"
-    #   ]
-    #   enable_auto_scaling = true
-    #   min_count           = 1
-    #   max_count           = 1
-    # }
-    platform = {
-      enable_node_public_ip = false
-      vm_size               = "Standard_DS5_v2"
-      zones                 = ["1", "2", "3"]
-      node_labels           = {}
-      node_os               = "Linux"
-      node_taints           = []
-      enable_auto_scaling   = true
-      min_count             = 1
-      max_count             = 4
+      max_count           = 3
+      max_pods            = 60
+      os_disk_size_gb     = 128
     }
   }
 }
@@ -137,4 +131,10 @@ variable "subscription_id" {
   type        = string
   description = "An existing Subscription ID to add the deployment"
   default     = ""
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Tags to apply to resources"
 }
