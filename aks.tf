@@ -51,12 +51,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   network_profile {
-    load_balancer_sku  = "Standard"
-    network_plugin     = "azure"
-    network_policy     = "calico"
-    dns_service_ip     = "100.97.0.10"
-    docker_bridge_cidr = "172.17.0.1/16"
-    service_cidr       = "100.97.0.0/16"
+    load_balancer_sku = "Standard"
+    network_plugin    = "azure"
+    network_policy    = "azure"
   }
 
   tags = local.tags
