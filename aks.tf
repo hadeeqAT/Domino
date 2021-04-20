@@ -1,3 +1,10 @@
+locals {
+  node_pools = {
+    for node_pool, attrs in var.node_pools :
+    node_pool => merge(attrs, lookup(var.node_pool_overrides, node_pool, {}))
+  }
+}
+
 resource "azurerm_kubernetes_cluster" "aks" {
   lifecycle {
     ignore_changes = [
@@ -20,18 +27,18 @@ resource "azurerm_kubernetes_cluster" "aks" {
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 
   default_node_pool {
-    enable_node_public_ip = var.node_pools.platform.enable_node_public_ip
+    enable_node_public_ip = local.node_pools.platform.enable_node_public_ip
     name                  = "platform"
-    node_count            = var.node_pools.platform.min_count
-    node_labels           = var.node_pools.platform.node_labels
-    vm_size               = var.node_pools.platform.vm_size
-    availability_zones    = var.node_pools.platform.zones
-    os_disk_size_gb       = var.node_pools.platform.os_disk_size_gb
-    node_taints           = var.node_pools.platform.node_taints
-    enable_auto_scaling   = var.node_pools.platform.enable_auto_scaling
-    min_count             = var.node_pools.platform.min_count
-    max_count             = var.node_pools.platform.max_count
-    max_pods              = var.node_pools.platform.max_pods
+    node_count            = local.node_pools.platform.min_count
+    node_labels           = local.node_pools.platform.node_labels
+    vm_size               = local.node_pools.platform.vm_size
+    availability_zones    = local.node_pools.platform.zones
+    os_disk_size_gb       = local.node_pools.platform.os_disk_size_gb
+    node_taints           = local.node_pools.platform.node_taints
+    enable_auto_scaling   = local.node_pools.platform.enable_auto_scaling
+    min_count             = local.node_pools.platform.min_count
+    max_count             = local.node_pools.platform.max_count
+    max_pods              = local.node_pools.platform.max_pods
     tags                  = local.tags
   }
 
@@ -66,7 +73,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
 
   for_each = {
     # Create all node pools except for 'platform' because it is the AKS default
-    for key, value in var.node_pools :
+    for key, value in local.node_pools :
     key => value
     if key != "platform"
   }

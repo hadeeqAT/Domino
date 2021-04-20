@@ -111,6 +111,11 @@ variable "node_pools" {
   }
 }
 
+variable "node_pool_overrides" {
+  type    = map(map(any))
+  default = {}
+}
+
 variable "storage_account_name" {
   type        = string
   default     = null
