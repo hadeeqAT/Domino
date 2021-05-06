@@ -5,6 +5,12 @@ locals {
   }
 }
 
+data "azurerm_kubernetes_service_versions" "selected" {
+  location        = local.resource_group.location
+  version_prefix  = var.kubernetes_version
+  include_preview = false
+}
+
 resource "azurerm_kubernetes_cluster" "aks" {
   lifecycle {
     ignore_changes = [
@@ -23,6 +29,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   dns_prefix              = local.cluster_name
   private_cluster_enabled = false
   sku_tier                = var.cluster_sku_tier
+  kubernetes_version      = var.kubernetes_version != null ? data.azurerm_kubernetes_service_versions.selected.latest_version : null
 
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 

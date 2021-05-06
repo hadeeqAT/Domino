@@ -37,7 +37,7 @@ jobs:
 
       - run:
           name: Terraform init
-          command: terraform init
+          command: terraform init -backend-config=key=$WORKSPACE.tfstate
 
       - run:
           name: Terraform validate
