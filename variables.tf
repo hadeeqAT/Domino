@@ -48,6 +48,7 @@ variable "node_pools" {
     min_count             = number
     max_count             = number
     max_pods              = number
+    initial_count         = number
     os_disk_size_gb       = number
   }))
   default = {
@@ -63,6 +64,7 @@ variable "node_pools" {
       enable_auto_scaling = true
       min_count           = 0
       max_count           = 10
+      initial_count       = 1
       max_pods            = 30
       os_disk_size_gb     = 128
     }
@@ -81,6 +83,7 @@ variable "node_pools" {
       enable_auto_scaling = true
       min_count           = 0
       max_count           = 1
+      initial_count       = 0
       max_pods            = 30
       os_disk_size_gb     = 128
     }
@@ -96,6 +99,7 @@ variable "node_pools" {
       enable_auto_scaling = true
       min_count           = 1
       max_count           = 3
+      initial_count       = 1
       max_pods            = 60
       os_disk_size_gb     = 128
     }

@@ -36,7 +36,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     enable_node_public_ip = local.node_pools.platform.enable_node_public_ip
     name                  = "platform"
-    node_count            = local.node_pools.platform.min_count
+    node_count            = local.node_pools.platform.initial_count
     node_labels           = local.node_pools.platform.node_labels
     vm_size               = local.node_pools.platform.vm_size
     availability_zones    = local.node_pools.platform.zones
@@ -88,7 +88,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   enable_node_public_ip = each.value.enable_node_public_ip
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   name                  = each.key
-  node_count            = each.value.min_count
+  node_count            = each.value.initial_count
   vm_size               = each.value.vm_size
   availability_zones    = each.value.zones
   os_disk_size_gb       = each.value.os_disk_size_gb
