@@ -1,10 +1,12 @@
 terraform {
   required_providers {
     azurerm = {
+      source  = "hashicorp/azurerm"
       version = "~> 2.46"
     }
 
     random = {
+      source  = "hashicorp/random"
       version = "~> 2.1"
     }
   }
@@ -43,4 +45,6 @@ module "aks" {
   resource_group                  = azurerm_resource_group.ci.name
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
   tags                            = var.tags
+
+  depends_on = [azurerm_resource_group.ci]
 }
