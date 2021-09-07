@@ -10,7 +10,7 @@ jobs:
     docker:
       - image: mcr.microsoft.com/azure-cli
     environment:
-      TERRAFORM_VERSION: 1.0.5
+      TERRAFORM_VERSION: 1.0.6
 
     steps:
       - checkout
@@ -30,10 +30,6 @@ jobs:
       - run:
           name: Terraform fmt
           command: terraform fmt -check
-
-      - run:
-          name: AKS install kubectl
-          command: az aks install-cli
 
       - run:
           name: Test Terraform

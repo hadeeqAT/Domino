@@ -3,9 +3,18 @@ variable "api_server_authorized_ip_ranges" {
   description = "The IP ranges to whitelist for incoming traffic to the masters"
 }
 
+variable "resource_group" {
+  type        = string
+  description = "Name of optional pre-existing resource group to install AKS in"
+}
+
 variable "cluster_name" {
   type        = string
   description = "The Domino cluster name for the K8s cluster and resource group"
+}
+
+variable "kubeconfig_output_path" {
+  type = string
 }
 
 variable "cluster_sku_tier" {
@@ -24,11 +33,6 @@ variable "containers" {
       container_access_type = "private"
     }
   }
-}
-
-variable "resource_group" {
-  type        = string
-  description = "Name of optional pre-existing resource group to install AKS in"
 }
 
 # refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing

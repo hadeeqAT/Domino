@@ -71,6 +71,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   tags = var.tags
+
+  provisioner "local-exec" {
+    command = <<-EOF
+      if ! az account show 2>/dev/null; then
+        az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET -t $ARM_TENANT_ID
+      fi
+      az aks get-credentials -f ${var.kubeconfig_output_path} -n ${var.cluster_name} -g ${data.azurerm_resource_group.aks.name}
+    EOF
+  }
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {

@@ -45,6 +45,7 @@ module "aks" {
   resource_group                  = azurerm_resource_group.ci.name
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
   tags                            = var.tags
+  kubeconfig_output_path          = "${path.cwd}/kubeconfig"
 
   depends_on = [azurerm_resource_group.ci]
 }
