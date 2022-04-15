@@ -10,7 +10,7 @@ jobs:
     docker:
       - image: mcr.microsoft.com/azure-cli
     environment:
-      TERRAFORM_VERSION: 1.0.6
+      TERRAFORM_VERSION: 1.1.8
 
     steps:
       - checkout

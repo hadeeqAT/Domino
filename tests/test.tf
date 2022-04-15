@@ -2,12 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 2.46"
-    }
-
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 2.1"
+      version = "~> 3.0"
     }
   }
 
@@ -20,7 +15,6 @@ terraform {
 }
 
 provider "azurerm" {
-  partner_id = "31912fbf-f6dd-5176-bffb-0a01e8ac71f2"
   features {}
 }
 
@@ -42,10 +36,8 @@ module "aks" {
   source = "./.."
 
   cluster_name                    = terraform.workspace
-  resource_group                  = azurerm_resource_group.ci.name
+  resource_group                  = azurerm_resource_group.ci.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
   tags                            = var.tags
   kubeconfig_output_path          = "${path.cwd}/kubeconfig"
-
-  depends_on = [azurerm_resource_group.ci]
 }

@@ -6,7 +6,7 @@ data "azurerm_subscription" "current" {
 }
 
 data "azurerm_resource_group" "aks" {
-  name = var.resource_group
+  name = reverse(split("/", var.resource_group))[0]
 }
 
 resource "azurerm_role_assignment" "aks_network" {

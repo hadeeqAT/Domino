@@ -39,7 +39,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     node_count            = local.node_pools.platform.initial_count
     node_labels           = local.node_pools.platform.node_labels
     vm_size               = local.node_pools.platform.vm_size
-    availability_zones    = local.node_pools.platform.zones
+    zones                 = local.node_pools.platform.zones
     os_disk_size_gb       = local.node_pools.platform.os_disk_size_gb
     node_taints           = local.node_pools.platform.node_taints
     enable_auto_scaling   = local.node_pools.platform.enable_auto_scaling
@@ -53,19 +53,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
     type = "SystemAssigned"
   }
 
-  addon_profile {
-    kube_dashboard {
-      enabled = false
-    }
 
-    oms_agent {
-      enabled                    = true
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
-    }
+  oms_agent {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
   }
 
   network_profile {
-    load_balancer_sku = "Standard"
+    load_balancer_sku = "standard"
     network_plugin    = "azure"
     network_policy    = "calico"
   }
@@ -100,7 +94,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   name                  = each.key
   node_count            = each.value.initial_count
   vm_size               = each.value.vm_size
-  availability_zones    = each.value.zones
+  zones                 = each.value.zones
   os_disk_size_gb       = each.value.os_disk_size_gb
   os_type               = each.value.node_os
   node_labels           = each.value.node_labels

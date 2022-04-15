@@ -5,7 +5,7 @@ variable "api_server_authorized_ip_ranges" {
 
 variable "resource_group" {
   type        = string
-  description = "Name of optional pre-existing resource group to install AKS in"
+  description = "Name or id of optional pre-existing resource group to install AKS in"
 }
 
 variable "cluster_name" {
