@@ -8,7 +8,7 @@ locals {
 data "azurerm_kubernetes_service_versions" "selected" {
   location        = data.azurerm_resource_group.aks.location
   version_prefix  = var.kubernetes_version
-  include_preview = false
+  include_preview = true
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
