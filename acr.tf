@@ -8,6 +8,8 @@ resource "azurerm_container_registry" "domino" {
 
   // Premium only
   public_network_access_enabled = var.registry_tier == "Premium" ? false : true
+
+  tags = var.tags
 }
 
 resource "azurerm_role_assignment" "aks-domino-acr" {

@@ -38,25 +38,7 @@ resource "azurerm_monitor_diagnostic_setting" "control-plane" {
   log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
 
   log {
-    category = "kube-apiserver"
-
-    retention_policy {
-      enabled = true
-      days    = 7
-    }
-  }
-
-  log {
-    category = "kube-controller-manager"
-
-    retention_policy {
-      enabled = true
-      days    = 7
-    }
-  }
-
-  log {
-    category = "kube-scheduler"
+    category = "cloud-controller-manager"
 
     retention_policy {
       enabled = true
@@ -66,6 +48,33 @@ resource "azurerm_monitor_diagnostic_setting" "control-plane" {
 
   log {
     category = "cluster-autoscaler"
+
+    retention_policy {
+      enabled = true
+      days    = 7
+    }
+  }
+
+  log {
+    category = "csi-azuredisk-controller"
+
+    retention_policy {
+      enabled = true
+      days    = 7
+    }
+  }
+
+  log {
+    category = "csi-azurefile-controller"
+
+    retention_policy {
+      enabled = true
+      days    = 7
+    }
+  }
+
+  log {
+    category = "csi-snapshot-controller"
 
     retention_policy {
       enabled = true
@@ -84,6 +93,16 @@ resource "azurerm_monitor_diagnostic_setting" "control-plane" {
   }
 
   log {
+    category = "kube-apiserver"
+
+    retention_policy {
+      enabled = true
+      days    = 7
+    }
+  }
+
+
+  log {
     category = "kube-audit"
     enabled  = false
 
@@ -100,6 +119,24 @@ resource "azurerm_monitor_diagnostic_setting" "control-plane" {
     retention_policy {
       enabled = false
       days    = 0
+    }
+  }
+
+  log {
+    category = "kube-controller-manager"
+
+    retention_policy {
+      enabled = true
+      days    = 7
+    }
+  }
+
+  log {
+    category = "kube-scheduler"
+
+    retention_policy {
+      enabled = true
+      days    = 7
     }
   }
 
