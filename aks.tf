@@ -3,12 +3,21 @@ locals {
     for node_pool, attrs in var.node_pools :
     node_pool => merge(attrs, lookup(var.node_pool_overrides, node_pool, {}))
   }
+
+  zonal_node_pools = flatten([for name, spec in local.node_pools : [
+    for zone in spec.zones :
+    {
+      node_pool_zone = zone
+      node_pool_name = name
+      node_pool_spec = spec
+    }
+    ]
+  ])
 }
 
 data "azurerm_kubernetes_service_versions" "selected" {
-  location        = data.azurerm_resource_group.aks.location
-  version_prefix  = var.kubernetes_version
-  include_preview = true
+  location       = data.azurerm_resource_group.aks.location
+  version_prefix = var.kubernetes_version
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
@@ -34,21 +43,19 @@ resource "azurerm_kubernetes_cluster" "aks" {
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 
   default_node_pool {
-    enable_node_public_ip = local.node_pools.platform.enable_node_public_ip
-    name                  = "platform"
-    node_count            = local.node_pools.platform.initial_count
-    node_labels           = local.node_pools.platform.node_labels
-    vm_size               = local.node_pools.platform.vm_size
-    zones                 = local.node_pools.platform.zones
-    os_disk_size_gb       = local.node_pools.platform.os_disk_size_gb
-    node_taints           = local.node_pools.platform.node_taints
-    enable_auto_scaling   = local.node_pools.platform.enable_auto_scaling
-    min_count             = local.node_pools.platform.min_count
-    max_count             = local.node_pools.platform.max_count
-    max_pods              = local.node_pools.platform.max_pods
-    tags                  = var.tags
+    enable_node_public_ip        = false
+    only_critical_addons_enabled = true
+    name                         = "system"
+    node_count                   = 1
+    vm_size                      = "standard_ds4_v2"
+    zones                        = ["1", "2", "3"]
+    os_disk_size_gb              = 128
+    enable_auto_scaling          = true
+    min_count                    = 1
+    max_count                    = 6
+    max_pods                     = 60
+    tags                         = var.tags
   }
-
   identity {
     type = "SystemAssigned"
   }
@@ -77,31 +84,29 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 }
 
+
+
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
+  for_each = { for ng in local.zonal_node_pools : "${ng.node_pool_name}${ng.node_pool_zone}" => ng }
+
+  enable_node_public_ip = each.value.node_pool_spec.enable_node_public_ip
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  name                  = each.key
+  node_count            = each.value.node_pool_spec.initial_count
+  vm_size               = each.value.node_pool_spec.vm_size
+  zones                 = [each.value.node_pool_zone]
+  os_disk_size_gb       = each.value.node_pool_spec.os_disk_size_gb
+  os_type               = each.value.node_pool_spec.node_os
+  node_labels           = each.value.node_pool_spec.node_labels
+  node_taints           = each.value.node_pool_spec.node_taints
+  enable_auto_scaling   = each.value.node_pool_spec.enable_auto_scaling
+  min_count             = each.value.node_pool_spec.min_count
+  max_count             = each.value.node_pool_spec.max_count
+  max_pods              = each.value.node_pool_spec.max_pods
+  tags                  = var.tags
+
   lifecycle {
     ignore_changes = [node_count, max_count, tags]
   }
 
-  for_each = {
-    # Create all node pools except for 'platform' because it is the AKS default
-    for key, value in local.node_pools :
-    key => value
-    if key != "platform"
-  }
-
-  enable_node_public_ip = each.value.enable_node_public_ip
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
-  name                  = each.key
-  node_count            = each.value.initial_count
-  vm_size               = each.value.vm_size
-  zones                 = each.value.zones
-  os_disk_size_gb       = each.value.os_disk_size_gb
-  os_type               = each.value.node_os
-  node_labels           = each.value.node_labels
-  node_taints           = each.value.node_taints
-  enable_auto_scaling   = each.value.enable_auto_scaling
-  min_count             = each.value.min_count
-  max_count             = each.value.max_count
-  max_pods              = each.value.max_pods
-  tags                  = var.tags
 }
