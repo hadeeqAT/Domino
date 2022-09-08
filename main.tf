@@ -1,7 +1,3 @@
-locals {
-  storage_account_name = substr("${replace(var.cluster_name, "/[_-]/", "")}dominostorage", 0, 24)
-}
-
 data "azurerm_subscription" "current" {
 }
 

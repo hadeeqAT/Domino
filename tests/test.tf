@@ -19,7 +19,7 @@ provider "azurerm" {
 }
 
 variable "api_server_authorized_ip_ranges" {
-  type    = list(string)
+  type = list(string)
 }
 
 variable "tags" {
@@ -35,7 +35,7 @@ resource "azurerm_resource_group" "ci" {
 module "aks" {
   source = "./.."
 
-  cluster_name                    = terraform.workspace
+  deploy_id                       = terraform.workspace
   resource_group                  = azurerm_resource_group.ci.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
   tags                            = var.tags

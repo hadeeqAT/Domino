@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "domino" {
-  name                     = local.storage_account_name
+  name                     = replace(var.deploy_id, "/[_-]/", "")
   location                 = data.azurerm_resource_group.aks.location
   resource_group_name      = data.azurerm_resource_group.aks.name
   account_kind             = "StorageV2"
@@ -21,7 +21,7 @@ resource "azurerm_storage_container" "domino_containers" {
     key => value
   }
 
-  name                  = substr("${var.cluster_name}-${each.key}", 0, 63)
+  name                  = "${var.deploy_id}-${each.key}"
   storage_account_name  = azurerm_storage_account.domino.name
   container_access_type = each.value.container_access_type
 }

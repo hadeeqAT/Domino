@@ -32,10 +32,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     ]
   }
 
-  name                    = var.cluster_name
+  name                    = var.deploy_id
   location                = data.azurerm_resource_group.aks.location
   resource_group_name     = data.azurerm_resource_group.aks.name
-  dns_prefix              = var.cluster_name
+  dns_prefix              = var.deploy_id
   private_cluster_enabled = false
   sku_tier                = var.cluster_sku_tier
   kubernetes_version      = data.azurerm_kubernetes_service_versions.selected.latest_version
@@ -79,12 +79,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
         az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET -t $ARM_TENANT_ID
       fi
 
-      az aks get-credentials --overwrite-existing -f ${var.kubeconfig_output_path} -n ${var.cluster_name} -g ${data.azurerm_resource_group.aks.name}
+      az aks get-credentials --overwrite-existing -f ${var.kubeconfig_output_path} -n ${var.deploy_id} -g ${data.azurerm_resource_group.aks.name}
     EOF
   }
 }
-
-
 
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   for_each = { for ng in local.zonal_node_pools : "${ng.node_pool_name}${ng.node_pool_zone}" => ng }

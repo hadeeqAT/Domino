@@ -8,9 +8,21 @@ variable "resource_group" {
   description = "Name or id of optional pre-existing resource group to install AKS in"
 }
 
-variable "cluster_name" {
+variable "deploy_id" {
   type        = string
-  description = "The Domino cluster name for the K8s cluster and resource group"
+  description = "Domino Deployment ID."
+  nullable    = false
+
+  validation {
+    condition     = length(var.deploy_id) >= 3 && length(var.deploy_id) <= 24 && can(regex("^([a-z][-a-z0-9]*[a-z0-9])$", var.deploy_id))
+    error_message = <<EOT
+      Variable deploy_id must:
+      1. Length must be between 3 and 24 characters.
+      2. Start with a letter.
+      3. End with a letter or digit.
+      4. May contain lowercase Alphanumeric characters and hyphens.
+    EOT
+  }
 }
 
 variable "kubeconfig_output_path" {
@@ -32,6 +44,20 @@ variable "containers" {
     backups = {
       container_access_type = "private"
     }
+  }
+  validation {
+    condition = alltrue([for k in keys(var.containers) :
+      length(k) >= 3 &&
+      length(k) <= 32 &&
+      can(regex("^([a-z][-a-z0-9]*[a-z0-9])$", k))
+    ])
+    error_message = <<EOT
+      Map containers keys must:
+      1. Length must be between 3 and 32 characters.
+      2. Start with a letter.
+      3. End with a letter or digit.
+      4. May contain lowercase Alphanumeric characters and hyphens.
+    EOT
   }
 }
 
