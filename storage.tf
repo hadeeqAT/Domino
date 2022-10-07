@@ -6,6 +6,7 @@ resource "azurerm_storage_account" "domino" {
   account_tier             = var.storage_account_tier
   account_replication_type = var.storage_account_replication_type
   access_tier              = "Hot"
+  min_tls_version          = "TLS1_2"
   tags                     = var.tags
 
   lifecycle {

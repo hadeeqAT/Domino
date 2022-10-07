@@ -1,0 +1,43 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: no-commit-to-branch
+      - id: check-case-conflict
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.75.0
+    hooks:
+      - id: terraform_docs
+        args:
+          - '--hook-config=--path-to-file=README.md'
+          - '--hook-config=--add-to-existing-file=true'
+          - '--hook-config=--create-file-if-not-exist=true'
+          - '--hook-config=--recursive.enabled=true'
+          - '--hook-config=--recursive.path=submodules'
+          - '--hook-config=--lockfile=false'
+      - id: terraform_fmt
+      - id: terraform_tflint
+        args:
+          - '--args=--config=__GIT_WORKING_DIR__/.tflint.hcl'
+          - '--args=--only=terraform_deprecated_interpolation'
+          - '--args=--only=terraform_deprecated_index'
+          - '--args=--only=terraform_unused_declarations'
+          - '--args=--only=terraform_comment_syntax'
+          - '--args=--only=terraform_documented_outputs'
+          - '--args=--only=terraform_documented_variables'
+          - '--args=--only=terraform_typed_variables'
+          - '--args=--only=terraform_module_pinned_source'
+          - '--args=--only=terraform_naming_convention'
+          - '--args=--only=terraform_required_version'
+          - '--args=--only=terraform_required_providers'
+          - '--args=--only=terraform_standard_module_structure'
+          - '--args=--only=terraform_workspace_remote'
+      - id: terraform_validate
+      - id: terraform_tfsec
+      # - id: terrascan # Skipping until they update lifecycle block; Data resources do not have lifecycle settings, so a lifecycle block is not allowed.
+        # args:
+        #   - '--args=--non-recursive'
+        #   - '--args=--policy-type=aws'
+        #   - '--args=--skip-rules=AC_AWS_0369' #Flow logs are enabled, terrascan does not follow the logical path of the resource

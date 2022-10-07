@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -16,14 +17,6 @@ terraform {
 
 provider "azurerm" {
   features {}
-}
-
-variable "api_server_authorized_ip_ranges" {
-  type = list(string)
-}
-
-variable "tags" {
-  type = map(string)
 }
 
 resource "azurerm_resource_group" "ci" {

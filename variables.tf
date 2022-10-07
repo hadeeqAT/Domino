@@ -26,7 +26,8 @@ variable "deploy_id" {
 }
 
 variable "kubeconfig_output_path" {
-  type = string
+  description = "kubeconfig path"
+  type        = string
 }
 
 variable "cluster_sku_tier" {
@@ -36,6 +37,7 @@ variable "cluster_sku_tier" {
 }
 
 variable "containers" {
+  description = "storage containers to create"
   type = map(object({
     container_access_type = string
   }))
@@ -63,92 +65,117 @@ variable "containers" {
 
 # refer https://azure.microsoft.com/pricing/details/monitor/ for log analytics pricing
 variable "log_analytics_workspace_sku" {
-  default = "PerGB2018"
+  description = "log analytics sku"
+  type        = string
+  default     = "PerGB2018"
 }
 
 variable "node_pools" {
-  type = map(object({
-    enable_node_public_ip = bool
-    vm_size               = string
-    zones                 = list(string)
-    node_labels           = map(string)
-    node_os               = string
-    node_taints           = list(string)
-    enable_auto_scaling   = bool
-    min_count             = number
-    max_count             = number
-    max_pods              = number
-    initial_count         = number
-    os_disk_size_gb       = number
-  }))
-  default = {
-    compute = {
-      enable_node_public_ip = false
-      vm_size               = "Standard_D8s_v4"
-      zones                 = ["1", "2", "3"]
-      node_labels = {
+  description = "default node pools"
+  type = object({
+    compute = object({
+      enable_node_public_ip = optional(bool, false)
+      vm_size               = optional(string, "Standard_D8s_v4")
+      zones                 = optional(list(string), ["1", "2", "3"])
+      node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "default"
-      }
-      node_os             = "Linux"
-      node_taints         = []
-      enable_auto_scaling = true
-      min_count           = 0
-      max_count           = 10
-      initial_count       = 1
-      max_pods            = 30
-      os_disk_size_gb     = 128
-    }
-    gpu = {
-      enable_node_public_ip = false
-      vm_size               = "Standard_NC6s_v3"
-      zones                 = []
-      node_labels = {
+      })
+      node_os             = optional(string, "Linux")
+      node_taints         = optional(list(string), [])
+      enable_auto_scaling = optional(bool, true)
+      min_count           = optional(number, 0)
+      max_count           = optional(number, 10)
+      initial_count       = optional(number, 1)
+      max_pods            = optional(number, 30)
+      os_disk_size_gb     = optional(number, 128)
+    }),
+    platform = object({
+      enable_node_public_ip = optional(bool, false)
+      vm_size               = optional(string, "Standard_D8s_v4")
+      zones                 = optional(list(string), ["1", "2", "3"])
+      node_labels = optional(map(string), {
+        "dominodatalab.com/node-pool" = "platform"
+      })
+      node_os             = optional(string, "Linux")
+      node_taints         = optional(list(string), [])
+      enable_auto_scaling = optional(bool, true)
+      min_count           = optional(number, 1)
+      max_count           = optional(number, 3)
+      initial_count       = optional(number, 1)
+      max_pods            = optional(number, 60)
+      os_disk_size_gb     = optional(number, 128)
+    }),
+    gpu = object({
+      enable_node_public_ip = optional(bool, false)
+      vm_size               = optional(string, "Standard_NC6s_v3")
+      zones                 = optional(list(string), [])
+      node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "default-gpu"
         "nvidia.com/gpu"              = "true"
-      }
-      node_os = "Linux"
-      node_taints = [
+      })
+      node_os = optional(string, "Linux")
+      node_taints = optional(list(string), [
         "nvidia.com/gpu=true:NoExecute"
-      ]
-      enable_auto_scaling = true
-      min_count           = 0
-      max_count           = 1
-      initial_count       = 0
-      max_pods            = 30
-      os_disk_size_gb     = 128
-    }
-    platform = {
-      enable_node_public_ip = false
-      vm_size               = "Standard_D8s_v4"
-      zones                 = ["1", "2", "3"]
-      node_labels = {
-        "dominodatalab.com/node-pool" = "platform"
-      }
-      node_os             = "Linux"
-      node_taints         = []
-      enable_auto_scaling = true
-      min_count           = 1
-      max_count           = 3
-      initial_count       = 1
-      max_pods            = 60
-      os_disk_size_gb     = 128
-    }
+      ])
+      enable_auto_scaling = optional(bool, true)
+      min_count           = optional(number, 0)
+      max_count           = optional(number, 1)
+      initial_count       = optional(number, 0)
+      max_pods            = optional(number, 30)
+      os_disk_size_gb     = optional(number, 128)
+    })
+    system = object({
+      enable_node_public_ip = optional(bool, false)
+      vm_size               = optional(string, "standard_ds4_v2")
+      zones                 = optional(list(string), ["1", "2", "3"])
+      node_labels           = optional(map(string), {})
+      node_os               = optional(string, "Linux")
+      node_taints           = optional(list(string), [])
+      enable_auto_scaling   = optional(bool, true)
+      min_count             = optional(number, 1)
+      max_count             = optional(number, 6)
+      initial_count         = optional(number, 1)
+      max_pods              = optional(number, 60)
+      os_disk_size_gb       = optional(number, 128)
+    })
+  })
+  default = {
+    compute  = {}
+    platform = {}
+    gpu      = {}
+    system   = {}
   }
 }
 
-variable "node_pool_overrides" {
-  type    = map(map(any))
+variable "additional_node_pools" {
+  description = "additional node pools"
+  type = map(object({
+    enable_node_public_ip = optional(bool, false)
+    vm_size               = string
+    zones                 = list(string)
+    node_labels           = map(string)
+    node_os               = optional(string, "Linux")
+    node_taints           = optional(list(string), [])
+    enable_auto_scaling   = optional(bool, true)
+    min_count             = optional(number, 0)
+    max_count             = number
+    initial_count         = optional(number, 0)
+    max_pods              = optional(number, 30)
+    os_disk_size_gb       = optional(number, 128)
+  }))
   default = {}
 }
 
 variable "storage_account_tier" {
-  type    = string
-  default = "Standard"
+  description = "storage account tier"
+  type        = string
+  default     = "Standard"
 }
 
 variable "storage_account_replication_type" {
-  type    = string
-  default = "LRS"
+  description = "storage replication"
+  type        = string
+  default     = "LRS"
 }
 
 variable "tags" {
@@ -164,6 +191,7 @@ variable "kubernetes_version" {
 }
 
 variable "registry_tier" {
-  type    = string
-  default = "Standard"
+  description = "registry tier"
+  type        = string
+  default     = "Standard"
 }

@@ -32,7 +32,7 @@ resource "azurerm_log_analytics_solution" "logs" {
   }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "control-plane" {
+resource "azurerm_monitor_diagnostic_setting" "control_plane" {
   name                       = "AKS Control Plane Logging"
   target_resource_id         = azurerm_kubernetes_cluster.aks.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
