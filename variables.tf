@@ -43,6 +43,9 @@ variable "containers" {
   }))
 
   default = {
+    projects = {
+      container_access_type = "private"
+    }
     backups = {
       container_access_type = "private"
     }
