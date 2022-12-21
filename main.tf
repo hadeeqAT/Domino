@@ -15,7 +15,7 @@ provider "azurerm" {
 
 
 module "domino-aks" {
-  source                          = "github.com/dominodatalab/terraform-azure-aks"
+  source                          = "github.com/hadeeqAT/Domino"
   api_server_authorized_ip_ranges = null
   resource_group                  = "MSA_Domino_PoC"
   deploy_id                       = "domino-aks-custer"
